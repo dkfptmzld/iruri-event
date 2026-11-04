@@ -82,7 +82,7 @@
   .ask{position:relative;margin-top:22px}
   /* 인사말 확인 전에는 질문 숨김 */
   body:not(.read) .ask, body:not(.read) .shelf{display:none}
-  body.read .read-wrap{display:none}
+  body.read .read-wrap, body.read .hero .letter{display:none}
   body.read .ask{animation:revealUp .6s ease both}
   .read-wrap{position:relative;margin:10px 0 40px}
   .read-btn{font:inherit;font-size:20px;font-weight:900;color:var(--forest);background:var(--gold);border:0;border-radius:999px;
@@ -624,7 +624,7 @@
   document.querySelectorAll(".choice").forEach(c => c.addEventListener("click", () => setMode(c.dataset.path)));
   $("readBtn").addEventListener("click", () => {
     document.body.classList.add("read");
-    window.scrollTo({top: $("ask").getBoundingClientRect().top + scrollY - 20, behavior: "smooth"});
+    window.scrollTo({top: 0, behavior: "instant"});
   });
 
   // 오늘 이전 날짜는 고를 수 없게
