@@ -127,6 +127,10 @@
   .rg.on::before{content:"✓ "}
   body:not(.has-region) .rg{animation:glow 2.4s ease-in-out infinite}
   .rg-hint{margin-top:10px;font-size:13px;opacity:.8}
+  .rg-contact{margin-top:10px;background:rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;font-size:15px}
+  .rg-contact b{color:var(--gold)}
+  .rg-contact a{color:#fff;font-weight:900;margin-left:4px}
+  body.has-region .rg-hint{display:none}
   body.mode-yes .pick-hint, body.mode-no .pick-hint{display:none}
   main{animation:revealUp .6s ease both}
   @keyframes revealUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
@@ -435,7 +439,8 @@
           <button type="button" class="rg" data-region="인천·경기">인천·경기</button>
           <button type="button" class="rg" data-region="수원">수원</button>
         </div>
-        <p class="rg-hint">지역에 맞는 담당자가 안내해 드려요</p>
+        <p class="rg-hint">지역을 누르시면 혜택과 신청서가 열려요</p>
+        <p class="rg-contact" id="rgContact" hidden></p>
       </div>
       <p class="pick-hint" id="pickHint"><span class="hand" aria-hidden="true">👆</span> 둘 중 하나를 눌러 주세요<br><small>선택하시면 받으실 혜택과 신청서가 열려요</small></p>
     </div>
@@ -632,7 +637,8 @@
   // ▼ 1) 문의 전화번호
   const PHONE = "010-0000-0000";
   // ▼ 지역별 담당자 연락처 (번호가 정해지면 바꿔 주세요)
-  const REGION_PHONE = {"서울": "010-0000-0000", "인천·경기": "010-0000-0000", "수원": "010-0000-0000"};
+  const REGION_PHONE = {"서울": "010-2304-0324", "인천·경기": "010-8311-1199", "수원": "010-7239-0604"};
+  const REGION_NAME  = {"서울": "정상준 과장", "인천·경기": "한수희 대리", "수원": "안지훈 과장"};
   let region = null;
   // ▼ 2) GAS 웹 앱 주소 (배포 후 받은 https://script.google.com/macros/s/.../exec 주소를 붙여 넣으세요)
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwO_o2hmNIZ2RuaiDKQa6I2wCc3e0WszClUv1_4AIH2Blq73WRFVGnPg1-lJ_mUsZMMlA/exec";
@@ -640,7 +646,9 @@
   function curPhone(){ return (region && REGION_PHONE[region]) || PHONE; }
   function showPhone(){
     const ph = curPhone();
-    document.querySelectorAll(".phone-text").forEach(e => e.textContent = (region ? region + " 담당 " : "") + "(" + ph + ")");
+    document.querySelectorAll(".phone-text").forEach(e => e.textContent = region ? region + " 담당 " + REGION_NAME[region] + " (" + ph + ")" : "(" + ph + ")");
+    const rc = document.getElementById("rgContact");
+    if(rc && region){ rc.innerHTML = `📞 ${region} 담당 <b>${REGION_NAME[region]}</b> <a href="tel:${ph.replace(/[^0-9]/g, "")}">${ph}</a>`; rc.hidden = false; }
     document.querySelectorAll(".phone-plain").forEach(e => e.textContent = "📞 " + ph);
     document.getElementById("telLink").href = "tel:" + ph.replace(/[^0-9]/g, "");
   }
