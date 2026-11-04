@@ -229,10 +229,25 @@
   .cases{border:3px solid var(--gold)}
   .cases-alert{margin:-4px -4px 0;background:var(--gold);color:var(--forest);font-weight:900;font-size:clamp(17px,4.6vw,21px);text-align:center;
     padding:12px 10px;border-radius:14px;line-height:1.35;animation:alertPulse 2.2s ease-in-out infinite}
-  .cases-alert b{background:#fff;padding:0 6px;border-radius:6px}
+  .cases-alert b{background:#fff;padding:0 6px;border-radius:6px;white-space:nowrap}
   @keyframes alertPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,184,61,.6)}50%{box-shadow:0 0 0 10px rgba(245,184,61,0)}}
   @media (prefers-reduced-motion:reduce){.cases-alert{animation:none}}
   .weeks{display:grid;gap:12px;margin-top:14px}
+  .cs-wrap{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .cs{border-radius:16px;padding:14px 10px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .cs-1{background:#eef3ec;border:2px solid var(--forest-3)}
+  .cs-2{background:#fff6df;border:2px solid var(--gold)}
+  .cs-no{font-size:12.5px;font-weight:900;letter-spacing:2px;padding:3px 12px;border-radius:999px}
+  .cs-1 .cs-no{background:var(--forest);color:var(--gold)}
+  .cs-2 .cs-no{background:var(--gold);color:var(--forest)}
+  .cs-if{font-size:14.5px;line-height:1.5;color:#2c362e;min-height:44px}
+  .cs-if b{color:var(--forest)}
+  .cs-arrow{font-size:12px;color:var(--muted)}
+  .cs-then{width:100%;background:#fff;border-radius:12px;padding:10px 6px;font-size:13.5px;line-height:1.5;color:#3d4a40;box-shadow:0 4px 12px rgba(15,58,32,.06)}
+  .cs-then b{display:block;font-size:17px;font-weight:900;color:var(--forest)}
+  .cs-or{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:var(--forest);color:#fff;
+    font-size:11.5px;font-weight:900;display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:1}
+  @media (max-width:380px){.cs-if{font-size:13.5px}.cs-then b{font-size:15.5px}}
   .wk{background:#fffdf6;border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;text-align:left}
   .wk-h{font-weight:900;color:var(--forest);font-size:15.5px;padding-bottom:10px;border-bottom:1.5px dashed var(--line)}
   .wk-n{font-size:22px;color:var(--forest);background:var(--gold-2);padding:0 8px;border-radius:8px;margin-right:2px}
@@ -507,11 +522,19 @@
 
   <div class="cases">
     <p class="cases-alert"><span aria-hidden="true">⚠️</span> 우리 센터는 어디에 해당하는지 <b>꼭 확인하세요!</b></p>
-    <div class="weeks">
-      <div class="wk">
-        <div class="wk-row wk-gift"><span class="cb cb-gift">GIFT 02</span><p>가산 때문에 <b>수업료를 지불해야 하는 경우</b><br><b>뉴케어 음료 60개</b>를 선택하실 수 있어요</p></div>
-        <div class="wk-or">혹은</div>
-        <div class="wk-row wk-free"><span class="cb cb-free">GIFT 01</span><p><b>수업료를 면제</b>해 드리고<br>수업을 진행하셔도 됩니다</p></div>
+    <div class="cs-wrap">
+      <div class="cs cs-1">
+        <span class="cs-no">CASE 1</span>
+        <p class="cs-if">수업료를<br><b>내지 않아도 되는</b> 센터</p>
+        <span class="cs-arrow" aria-hidden="true">▼</span>
+        <p class="cs-then"><b>수업료 면제</b><br>이루리 수업 1회 무료</p>
+      </div>
+      <span class="cs-or" aria-hidden="true">또는</span>
+      <div class="cs cs-2">
+        <span class="cs-no">CASE 2</span>
+        <p class="cs-if">가산 때문에 수업료를<br><b>지불해야 하는</b> 센터</p>
+        <span class="cs-arrow" aria-hidden="true">▼</span>
+        <p class="cs-then"><b>뉴케어 음료 60개</b><br>또는 수업료 면제 중 선택</p>
       </div>
     </div>
     <ul class="cases-note">
