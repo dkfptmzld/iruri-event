@@ -80,6 +80,19 @@
 
   /* ───── 시작 질문 ───── */
   .ask{position:relative;margin-top:22px}
+  /* 인사말 확인 전에는 질문 숨김 */
+  body:not(.read) .ask, body:not(.read) .shelf{display:none}
+  body.read .read-wrap{display:none}
+  body.read .ask{animation:revealUp .6s ease both}
+  .read-wrap{position:relative;margin:10px 0 40px}
+  .read-btn{font:inherit;font-size:20px;font-weight:900;color:var(--forest);background:var(--gold);border:0;border-radius:999px;
+    padding:16px 56px;cursor:pointer;box-shadow:0 10px 28px rgba(245,184,61,.4);animation:readPulse 2s ease-in-out infinite}
+  .read-btn:hover{filter:brightness(1.05)}
+  .read-btn span{display:inline-block;margin-left:6px;transition:transform .2s}
+  .read-btn:hover span{transform:translateX(4px)}
+  .read-hint{margin-top:12px;font-size:14px;opacity:.8}
+  @keyframes readPulse{0%,100%{box-shadow:0 10px 28px rgba(245,184,61,.35),0 0 0 0 rgba(245,184,61,.5)}50%{box-shadow:0 10px 28px rgba(245,184,61,.35),0 0 0 12px rgba(245,184,61,0)}}
+  @media (prefers-reduced-motion:reduce){.read-btn,body.read .ask{animation:none!important}}
   .ask-tag{display:inline-block;font-size:13px;font-weight:900;letter-spacing:.5px;color:var(--gold-2);border-bottom:2px solid var(--gold);padding-bottom:2px}
   .ask-q{font-size:clamp(21px,5.6vw,30px);font-weight:900;line-height:1.35;margin-top:10px}
   .ask-q b{color:var(--gold)}
@@ -323,6 +336,10 @@
         <span class="name">이재하 드림</span>
       </div>
     </section>
+    <div class="read-wrap" id="readWrap">
+      <button type="button" class="read-btn" id="readBtn">확인 <span aria-hidden="true">→</span></button>
+      <p class="read-hint">인사말을 읽으셨다면 눌러 주세요</p>
+    </div>
     <div class="ask" id="ask">
       <p class="ask-tag">Q. 먼저 하나만 여쭤볼게요</p>
       <p class="ask-q">우리 센터, 지금 <b>케어포</b>를<br>사용하고 계신가요?</p>
@@ -592,6 +609,10 @@
     window.scrollTo({top: target.getBoundingClientRect().top + scrollY - 8, behavior: "smooth"});
   }
   document.querySelectorAll(".choice").forEach(c => c.addEventListener("click", () => setMode(c.dataset.path)));
+  $("readBtn").addEventListener("click", () => {
+    document.body.classList.add("read");
+    window.scrollTo({top: $("ask").getBoundingClientRect().top + scrollY - 20, behavior: "smooth"});
+  });
 
   // 오늘 이전 날짜는 고를 수 없게
   const today = new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
