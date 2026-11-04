@@ -113,8 +113,20 @@
   .c-go{font-size:13.5px;font-weight:700;margin-top:6px;opacity:.9}
 
   /* ───── 선택 전: 아래 내용 숨김 + 선택 유도 애니메이션 ───── */
-  body:not(.mode-yes):not(.mode-no) main,
-  body:not(.mode-yes):not(.mode-no) footer{display:none}
+  body:not(.has-region) main,
+  body:not(.has-region) footer{display:none}
+  .region{display:none;margin-top:22px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);border-radius:20px;padding:18px 14px 14px}
+  body.mode-yes .region, body.mode-no .region{display:block;animation:revealUp .5s ease both}
+  .rg-q{font-size:19px;font-weight:900}
+  .rg-q b{color:var(--gold)}
+  .rg-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .rg{font:inherit;font-size:17px;font-weight:900;color:#fff;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3);
+    border-radius:14px;padding:14px 4px;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+  .rg:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .rg.on{background:var(--gold);border-color:var(--gold);color:var(--forest)}
+  .rg.on::before{content:"✓ "}
+  body:not(.has-region) .rg{animation:glow 2.4s ease-in-out infinite}
+  .rg-hint{margin-top:10px;font-size:13px;opacity:.8}
   body.mode-yes .pick-hint, body.mode-no .pick-hint{display:none}
   main{animation:revealUp .6s ease both}
   @keyframes revealUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
@@ -403,6 +415,15 @@
           <span class="c-go">무료 이용권 받기 →</span>
         </button>
       </div>
+      <div class="region" id="region">
+        <p class="rg-q">센터는 <b>어느 지역</b>에 있나요?</p>
+        <div class="rg-btns">
+          <button type="button" class="rg" data-region="서울">서울</button>
+          <button type="button" class="rg" data-region="인천·경기">인천·경기</button>
+          <button type="button" class="rg" data-region="수원">수원</button>
+        </div>
+        <p class="rg-hint">지역에 맞는 담당자가 안내해 드려요</p>
+      </div>
       <p class="pick-hint" id="pickHint"><span class="hand" aria-hidden="true">👆</span> 둘 중 하나를 눌러 주세요<br><small>선택하시면 받으실 혜택과 신청서가 열려요</small></p>
     </div>
     <div class="shelf" aria-hidden="true">
@@ -580,13 +601,20 @@
 <script>
   // ▼ 1) 문의 전화번호
   const PHONE = "010-0000-0000";
+  // ▼ 지역별 담당자 연락처 (번호가 정해지면 바꿔 주세요)
+  const REGION_PHONE = {"서울": "010-0000-0000", "인천·경기": "010-0000-0000", "수원": "010-0000-0000"};
+  let region = null;
   // ▼ 2) GAS 웹 앱 주소 (배포 후 받은 https://script.google.com/macros/s/.../exec 주소를 붙여 넣으세요)
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwO_o2hmNIZ2RuaiDKQa6I2wCc3e0WszClUv1_4AIH2Blq73WRFVGnPg1-lJ_mUsZMMlA/exec";
 
-  const digits = PHONE.replace(/[^0-9]/g, "");
-  document.querySelectorAll(".phone-text").forEach(e => e.textContent = "(" + PHONE + ")");
-  document.querySelectorAll(".phone-plain").forEach(e => e.textContent = "📞 " + PHONE);
-  document.getElementById("telLink").href = "tel:" + digits;
+  function curPhone(){ return (region && REGION_PHONE[region]) || PHONE; }
+  function showPhone(){
+    const ph = curPhone();
+    document.querySelectorAll(".phone-text").forEach(e => e.textContent = (region ? region + " 담당 " : "") + "(" + ph + ")");
+    document.querySelectorAll(".phone-plain").forEach(e => e.textContent = "📞 " + ph);
+    document.getElementById("telLink").href = "tel:" + ph.replace(/[^0-9]/g, "");
+  }
+  showPhone();
 
   const gifts = document.querySelectorAll(".gift");
   const chosen = document.getElementById("chosen");
@@ -618,9 +646,23 @@
     $("steps").innerHTML = STEPS[m].map((t, i) => `<div class="step"><b>${i + 1}</b>${t}</div>`).join("");
     bar.classList.toggle("show", m === "yes" && !!picked);
     refresh();
-    const target = m === "yes" ? $("pathYes") : $("pathNo");
+    if(!region){
+      setTimeout(() => window.scrollTo({top: $("region").getBoundingClientRect().top + scrollY - 20, behavior: "smooth"}), 50);
+      return;
+    }
+    goPath();
+  }
+  function goPath(){
+    const target = mode === "yes" ? $("pathYes") : $("pathNo");
     window.scrollTo({top: target.getBoundingClientRect().top + scrollY - 8, behavior: "smooth"});
   }
+  document.querySelectorAll(".rg").forEach(b => b.addEventListener("click", () => {
+    region = b.dataset.region;
+    document.querySelectorAll(".rg").forEach(x => x.classList.toggle("on", x === b));
+    document.body.classList.add("has-region");
+    showPhone();
+    setTimeout(goPath, 50);
+  }));
   document.querySelectorAll(".choice").forEach(c => c.addEventListener("click", () => setMode(c.dataset.path)));
   $("readBtn").addEventListener("click", () => {
     document.body.classList.add("read");
@@ -667,7 +709,8 @@
     const v = id => $(id).value.trim();
     const data = {
       type: mode,
-      center: v("center"), addr: v("addr"), manager: v("manager"), phone: v("phone"),
+      center: v("center"), addr: (region ? "[" + region + "] " : "") + v("addr"), manager: v("manager"), phone: v("phone"),
+      region: region || "",
       date1: mode === "yes" ? fmtDate(v("date1")) : "",
       date2: mode === "yes" ? fmtDate(v("date2")) : "",
       gift: mode === "yes" ? (picked || "") : "",
@@ -691,7 +734,7 @@
       showDone(data);
     }catch(err){
       statusEl.className = "status err";
-      statusEl.textContent = "전송하지 못했어요. 잠시 후 다시 눌러 주시거나 " + PHONE + "로 연락 주세요.";
+      statusEl.textContent = "전송하지 못했어요. 잠시 후 다시 눌러 주시거나 " + curPhone() + "로 연락 주세요.";
       submitBtn.textContent = "📨 다시 제출하기";
     }finally{
       sending = false;
